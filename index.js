@@ -1,48 +1,29 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const twilio = require("twilio");
-
+const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8080;
 
-app.use(cors());
+// Middleware
 app.use(bodyParser.json());
 
-// Twilio credentials from environment variables
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
-
-const client = twilio(accountSid, authToken);
-
 // POST /call endpoint
-app.post("/call", async (req, res) => {
+app.post('/call', (req, res) => {
   const { to, message } = req.body;
 
   if (!to || !message) {
     return res.status(400).json({ error: 'Missing phone number or message' });
   }
 
-  try {
-    const call = await client.calls.create({
-      twiml: `<Response><Say>${message}</Say></Response>`,
-      to,
-      from: twilioNumber
-    });
+  console.log(`📞 Simulating call to ${to}: ${message}`);
 
-    res.json({ success: true, sid: call.sid });
-  } catch (error) {
-    console.error("Error making call:", error.message);
-    res.status(500).json({ error: error.message });
-  }
+  // Placeholder: you can call your real Twilio or ElevenLabs logic here
+  res.status(200).json({
+    success: true,
+    message: `Call placed to ${to} with message: ${message}`
+  });
 });
 
-// Root route (optional)
-app.get("/", (req, res) => {
-  res.send("AI Cold Caller API is running.");
-});
-
+// Start server
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`✅ AI Cold Caller backend running on port ${port}`);
 });
